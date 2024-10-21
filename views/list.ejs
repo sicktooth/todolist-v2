@@ -6,8 +6,8 @@
                 <section class="bg-white box">
                     <ul>
                     <% newListItems.forEach(newItem => { %>
-                        <form action="">
-                           <li class="item"><input type="checkbox" class="checkBox m-5 cursor-pointer"> <%= newItem.name %></li>
+                        <form action="/delete" method="post">
+                           <li class="item"><input name="checkBox" value="<%= newItem._id %>" onchange="this.form.submit()" type="checkbox" class="checkBox m-5 cursor-pointer"> <%= newItem.name %></li>
                         </form>
                     <% }) %>
                     </ul>

@@ -37,12 +37,16 @@ async function findResults() {
             });
         }
     } catch (error) {
-        console.log(error);
+            console.log(error);
+        }
     }
-}
     findResults();
     
 });
+
+app.post("/delete", function(req, res){
+    console.log(req.body.checkBox)
+})
 
 app.get("/work", function(req, res) {
     res.render("list", {
