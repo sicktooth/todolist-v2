@@ -1,16 +1,18 @@
 <%- include('header'); -%>
         <main class="mx-auto my-12 max-w-sm">
                 <header class="text-center mb-12">
-                    <h1 class="bg-purple-300 p-2 text-white text-3xl font-bold" id="head"><%= listTitle %></h1>
+                    <h1 class="bg-purple-300 p-2 text-white text-3xl font-bold arima" id="head"><%= listTitle %></h1>
                 </header>
                 <section class="bg-white box">
                     <ul>
-                    <% for (let start = 0; start<newListItems.length; start++){ %>
-                        <li class="item"><input type="checkbox" class="checkBox m-5 cursor-pointer"> <%= newListItems[start] %></li>
-                    <% } %>
+                    <% newListItems.forEach(newItem => { %>
+                        <form action="">
+                           <li class="item"><input type="checkbox" class="checkBox m-5 cursor-pointer"> <%= newItem.name %></li>
+                        </form>
+                    <% }) %>
                     </ul>
                     <form action="/" method="post" class="form">
-                        <input type="text" name="newItem" placeholder="New Item">
+                        <input class="arima font-bold" type="text" name="newItem" placeholder="New Item">
                         <button type="submit" class="btn" name="list" value=<%= listTitle %>>
                             +
                         </button>

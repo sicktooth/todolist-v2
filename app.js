@@ -1,22 +1,46 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
+const {Schema} = mongoose;
 const port = 8000;
-const date = require(__dirname + '/date.js');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-const items = ["Buy Food", "Cook Food", "Eat Food"],
-      workItems = [];
+mongoose.connect('mongodb://localhost:27017/todolistDB');
+
+const itemsSchema = new Schema ({
+    name: String
+});
+
+const Item = mongoose.model('Item', itemsSchema);
+const item1 = {name: "Eat"};
+const item2 = {name: "Code & Work"};
+const item3 = {name: "Add yours below"};
+const defaultItems = [item1, item2, item3]
+
 
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
+async function findResults() {
     
-    const dayOfWeek = date.getDate();
-    res.render("list", {
-        listTitle: dayOfWeek,
-        newListItems: items
-    });
+    try {
+        let results = await Item.find({});
+
+        if (results.length === 0) {
+            Item.insertMany(defaultItems)
+            res.redirect('/')
+        } else {
+                res.render("list", {
+                listTitle: "Today",
+                newListItems: results
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+    findResults();
     
 });
 
@@ -28,14 +52,9 @@ app.get("/work", function(req, res) {
 });
 
 app.post("/", (req, res) =>{
-    const item = req.body.newItem;
-    if (req.body.list === "Work") {
-        workItems.push(item);
-        res.redirect("/work")
-    } else {
-        items.push(item);
-        res.redirect("/");
-    }
+    const itemName = req.body.newItem;
+    Item.create({name: itemName});
+    res.redirect("/")
 })
 
 app.post("/work", (req, res) => {
