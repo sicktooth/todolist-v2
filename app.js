@@ -45,7 +45,20 @@ async function findResults() {
 });
 
 app.post("/delete", function(req, res){
-    console.log(req.body.checkBox)
+    const checkedItemId = req.body.checkBox;
+    // console.log(checkedItemId);
+    
+    async function deleteTask() {
+        try {
+           await Item.findByIdAndDelete(checkedItemId);
+           console.log("successfully deleted the Item");
+           res.redirect('/');
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    deleteTask();
+    
 })
 
 app.get("/work", function(req, res) {
