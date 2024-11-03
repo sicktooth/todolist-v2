@@ -14,35 +14,66 @@ const itemsSchema = new Schema ({
 });
 
 const Item = mongoose.model('Item', itemsSchema);
-const item1 = {name: "Eat"};
-const item2 = {name: "Code & Work"};
-const item3 = {name: "Add yours below"};
+const item1 = {name: "Welcome to your Todo list"};
+const item2 = {name: "⬅ hit the check to delete"};
+const item3 = {name: "Add yours below ⬇"};
 const defaultItems = [item1, item2, item3]
 
+const listSchema = new Schema ({
+    name: String,
+    items: [itemsSchema]
+});
+const List = mongoose.model('List', listSchema);
 
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
-async function findResults() {
+    async function findResults() {
     
-    try {
-        let results = await Item.find({});
+        try {
+            let results = await Item.find({});
 
-        if (results.length === 0) {
-            Item.insertMany(defaultItems)
-            res.redirect('/')
-        } else {
-                res.render("list", {
-                listTitle: "Today",
-                newListItems: results
-            });
-        }
-    } catch (error) {
-            console.log(error);
-        }
+            if (results.length === 0) {
+                Item.insertMany(defaultItems)
+                res.redirect('/')
+            } else {
+                    res.render("list", {
+                    listTitle: "Today",
+                    newListItems: results
+                });
+            }
+        } catch (error) {
+                console.log(error);
+            }
     }
     findResults();
     
 });
+
+app.get("/:customListName", (req, res)=>{
+    const customListItems = req.params.customListName;
+    
+    const findResults = async () => {
+        try {
+            let results = await List.findOne({name:customListItems});
+            
+            if (results) {
+                res.render('list', {
+                    listTitle: `${results.name} Todo List`,
+                    newListItems: results.items
+                });
+            } else {
+                List.create({
+                    name: customListItems,
+                    items: defaultItems
+                })
+                res.redirect(`/${customListItems}`);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    findResults();
+})
 
 app.post("/delete", function(req, res){
     const checkedItemId = req.body.checkBox;
@@ -60,13 +91,6 @@ app.post("/delete", function(req, res){
     deleteTask();
     
 })
-
-app.get("/work", function(req, res) {
-    res.render("list", {
-        listTitle: "Work List",
-        newListItems: workItems
-    })
-});
 
 app.post("/", (req, res) =>{
     const itemName = req.body.newItem;
