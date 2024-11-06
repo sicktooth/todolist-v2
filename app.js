@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 const port = 8000;
+const _ = require('lodash')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
@@ -50,23 +51,24 @@ app.get('/', (req, res) => {
 });
 
 app.get("/:customListName", (req, res)=>{
-    const customListItems = req.params.customListName;
+    const capitalizeCustomListName = _.capitalize(req.params.customListName);
+    const customListName = _.kebabCase(capitalizeCustomListName);
     
     const findResults = async () => {
         try {
-            let results = await List.findOne({name:customListItems});
+            let results = await List.findOne({name:customListName});
             
             if (results) {
                 res.render('list', {
-                    listTitle: `${results.name} Todo List`,
+                    listTitle: `${results.name}`,
                     newListItems: results.items
                 });
             } else {
                 List.create({
-                    name: customListItems,
+                    name: customListName,
                     items: defaultItems
                 })
-                res.redirect(`/${customListItems}`);
+                res.redirect(`/${customListName}`);
             }
         } catch (error) {
             console.log(error);
@@ -77,13 +79,21 @@ app.get("/:customListName", (req, res)=>{
 
 app.post("/delete", function(req, res){
     const checkedItemId = req.body.checkBox;
-    // console.log(checkedItemId);
+    const listName = req.body.listName;
+    console.log(checkedItemId);
     
     async function deleteTask() {
         try {
-           await Item.findByIdAndDelete(checkedItemId);
-           console.log("successfully deleted the Item");
-           res.redirect('/');
+            if (listName === "Today"){
+                await Item.findByIdAndDelete(checkedItemId);
+                console.log("successfully deleted the Item");
+                res.redirect('/');
+            } else {
+                await List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}})
+                console.log("successfully deleted the Item");
+                res.redirect('/'+listName);
+            }
+           
         } catch (error) {
             console.log(error);
         }
@@ -94,8 +104,23 @@ app.post("/delete", function(req, res){
 
 app.post("/", (req, res) =>{
     const itemName = req.body.newItem;
-    Item.create({name: itemName});
-    res.redirect("/")
+    const listName = req.body.list;
+    
+    if (listName === "Today") {
+        
+        Item.create({name: itemName})
+        res.redirect("/")
+    } else {
+        const find = async () => {
+            try {
+                await List.findOneAndUpdate({name:listName}, {$push: {items: {name: itemName}}})
+                res.redirect(`/${listName}`);
+            } catch (error) {
+                console.log(error, error.message);
+            }
+        }
+        find()
+    }
 })
 
 app.post("/work", (req, res) => {
