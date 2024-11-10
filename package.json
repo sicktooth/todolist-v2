@@ -13,9 +13,11 @@
   "author": "Samuel Ogboru",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
+    "mongodb": "^6.10.0",
     "mongoose": "^8.7.2"
   },
   "devDependencies": {

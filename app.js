@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -8,7 +9,7 @@ const _ = require('lodash')
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-mongoose.connect('mongodb://localhost:27017/todolistDB');
+mongoose.connect("mongodb+srv://sicktooth003:"+process.env.remoteDB_connect_password+"@cluster0.diwwq.mongodb.net/todolistDB");
 
 const itemsSchema = new Schema ({
     name: String
@@ -122,12 +123,6 @@ app.post("/", (req, res) =>{
         find()
     }
 })
-
-app.post("/work", (req, res) => {
-    const item = req.body.newItem;
-    workItems.push(item);
-    res.redirect("/work");
-});
 
 app.get("/about", (req, res) => {
     res.render("about");
