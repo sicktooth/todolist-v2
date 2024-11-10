@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
-const port = process.env.PORT || 8000;
+const port = process.env.PORT;
 const _ = require('lodash')
 
 app.use(express.urlencoded({ extended: true }));
@@ -128,6 +128,6 @@ app.get("/about", (req, res) => {
     res.render("about");
 });
 
-app.listen(port, function() {
+app.listen(port || 8000, function() {
     console.log("listening on port " + port);
 });
