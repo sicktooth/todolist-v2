@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
-const port = 8000;
+const port = process.env.PORT || 8000;
 const _ = require('lodash')
 
 app.use(express.urlencoded({ extended: true }));
